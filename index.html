@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mohrfeld Solar</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --black:#080808;
+  --white:#f2f0ed;
+  --gold:#c8963e;
+  --gold-bright:#f5a623;
+  --muted:#3a3a3a;
+  --mid:#888;
+  --border:#1c1c1c;
+}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--black);
+  color:var(--white);
+  font-family:'DM Sans',sans-serif;
+  font-weight:300;
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* custom cursor */
+.cursor{
+  width:8px;height:8px;
+  background:var(--white);
+  border-radius:50%;
+  position:fixed;
+  top:0;left:0;
+  pointer-events:none;
+  z-index:9999;
+  transition:transform 0.15s ease, background 0.2s;
+  transform:translate(-50%,-50%);
+}
+.cursor-ring{
+  width:32px;height:32px;
+  border:0.5px solid rgba(242,240,237,0.3);
+  border-radius:50%;
+  position:fixed;
+  top:0;left:0;
+  pointer-events:none;
+  z-index:9998;
+  transform:translate(-50%,-50%);
+  transition:transform 0.08s ease, width 0.2s, height 0.2s, border-color 0.2s;
+}
+
+/* nav */
+nav{
+  position:fixed;top:0;left:0;right:0;
+  z-index:100;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:1.8rem 3rem;
+  mix-blend-mode:difference;
+}
+.nav-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.2rem;
+  letter-spacing:0.2em;
+  color:var(--white);
+  text-decoration:none;
+}
+.nav-links{display:flex;gap:2.5rem;list-style:none;}
+.nav-links a{
+  color:var(--white);
+  text-decoration:none;
+  font-size:0.7rem;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  opacity:0.5;
+  transition:opacity 0.2s;
+}
+.nav-links a:hover{opacity:1;}
+
+/* hero */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:0 3rem 4rem;
+  position:relative;
+  overflow:hidden;
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 50% at 70% 40%, rgba(200,150,62,0.07) 0%, transparent 70%);
+  pointer-events:none;
+}
+.hero-line{
+  position:absolute;
+  top:0;right:20%;
+  width:0.5px;height:100%;
+  background:linear-gradient(to bottom, transparent, var(--border) 20%, var(--border) 80%, transparent);
+  opacity:0.6;
+}
+.hero-counter{
+  position:absolute;
+  top:2rem;right:3rem;
+  font-size:0.65rem;
+  letter-spacing:0.2em;
+  color:var(--mid);
+  writing-mode:vertical-rl;
+  padding-top:8rem;
+}
+.hero-eyebrow{
+  font-size:0.65rem;
+  letter-spacing:0.25em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-bottom:1.5rem;
+  opacity:0;
+  animation:reveal 0.8s ease 0.3s forwards;
+}
+.hero-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(5rem, 14vw, 13rem);
+  line-height:0.88;
+  letter-spacing:-0.01em;
+  color:var(--white);
+  opacity:0;
+  animation:reveal 1s ease 0.5s forwards;
+}
+.hero-title span{
+  display:block;
+  color:transparent;
+  -webkit-text-stroke:1px rgba(242,240,237,0.25);
+}
+.hero-sub{
+  margin-top:2.5rem;
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  opacity:0;
+  animation:reveal 0.8s ease 0.9s forwards;
+}
+.hero-desc{
+  font-size:0.85rem;
+  color:var(--mid);
+  line-height:1.8;
+  max-width:340px;
+  font-weight:300;
+}
+.hero-cta{
+  display:flex;flex-direction:column;align-items:flex-end;gap:0.8rem;
+}
+.btn-stark{
+  display:inline-block;
+  background:var(--white);
+  color:var(--black);
+  font-family:'DM Sans',sans-serif;
+  font-size:0.7rem;
+  font-weight:500;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  text-decoration:none;
+  padding:0.9rem 2rem;
+  transition:background 0.2s, color 0.2s;
+}
+.btn-stark:hover{background:var(--gold-bright);color:var(--black);}
+.btn-ghost{
+  font-size:0.65rem;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--mid);
+  text-decoration:none;
+  transition:color 0.2s;
+}
+.btn-ghost:hover{color:var(--white);}
+.hero-scroll{
+  position:absolute;
+  bottom:2.5rem;left:50%;
+  transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:0.5rem;
+  opacity:0;
+  animation:reveal 0.8s ease 1.4s forwards;
+}
+.scroll-line{
+  width:0.5px;height:40px;
+  background:linear-gradient(to bottom, var(--mid), transparent);
+  animation:scrollpulse 2s ease infinite;
+}
+.scroll-label{font-size:0.55rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--mid);}
+@keyframes scrollpulse{0%,100%{opacity:0.3;}50%{opacity:1;}}
+
+/* section base */
+section{padding:8rem 3rem;}
+.section-num{
+  font-size:0.6rem;
+  letter-spacing:0.2em;
+  color:var(--muted);
+  margin-bottom:0.8rem;
+}
+.section-eyebrow{
+  font-size:0.65rem;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-bottom:1rem;
+}
+.section-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(3rem,7vw,6rem);
+  line-height:0.92;
+  letter-spacing:0.01em;
+  margin-bottom:2rem;
+}
+
+/* about */
+.about{border-top:0.5px solid var(--border);}
+.about-grid{
+  display:grid;
+  grid-template-columns:1fr 1.4fr;
+  gap:6rem;
+  align-items:start;
+  margin-top:4rem;
+}
+.about-left{}
+.about-stats{
+  display:flex;flex-direction:column;gap:0;
+  margin-top:3rem;
+}
+.about-stat{
+  padding:1.5rem 0;
+  border-top:0.5px solid var(--border);
+  display:flex;justify-content:space-between;align-items:baseline;
+}
+.about-stat:last-child{border-bottom:0.5px solid var(--border);}
+.stat-big{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:3.5rem;
+  color:var(--gold);
+  line-height:1;
+}
+.stat-desc{font-size:0.75rem;color:var(--mid);letter-spacing:0.05em;max-width:160px;text-align:right;line-height:1.5;}
+.about-right p{
+  font-size:1rem;
+  color:var(--mid);
+  line-height:1.9;
+  margin-bottom:1.5rem;
+  font-weight:300;
+}
+.about-right p strong{color:var(--white);font-weight:400;}
+.about-right .signature{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:2rem;
+  color:var(--white);
+  letter-spacing:0.05em;
+  margin-top:2rem;
+}
+.about-right .sig-title{font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--mid);margin-top:0.3rem;}
+
+/* tools */
+.tools{border-top:0.5px solid var(--border);}
+.tools-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:0;
+  margin-top:4rem;
+  border:0.5px solid var(--border);
+}
+.tool-card{
+  padding:2.5rem 2rem;
+  border-right:0.5px solid var(--border);
+  transition:background 0.3s;
+  text-decoration:none;
+  display:block;
+  position:relative;
+  overflow:hidden;
+}
+.tool-card:last-child{border-right:none;}
+.tool-card::after{
+  content:'';
+  position:absolute;
+  bottom:0;left:0;right:0;
+  height:2px;
+  background:var(--gold);
+  transform:scaleX(0);
+  transform-origin:left;
+  transition:transform 0.4s ease;
+}
+.tool-card:hover{background:rgba(200,150,62,0.04);}
+.tool-card:hover::after{transform:scaleX(1);}
+.tool-num{font-size:0.6rem;letter-spacing:0.2em;color:var(--muted);margin-bottom:2rem;}
+.tool-icon{font-size:1.4rem;margin-bottom:1.2rem;}
+.tool-name{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.8rem;
+  letter-spacing:0.03em;
+  color:var(--white);
+  margin-bottom:0.6rem;
+  line-height:1;
+}
+.tool-desc{font-size:0.78rem;color:var(--mid);line-height:1.7;margin-bottom:2rem;}
+.tool-link{
+  font-size:0.6rem;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  color:var(--gold);
+}
+
+/* pricing */
+.pricing{border-top:0.5px solid var(--border);}
+.pricing-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:0;
+  margin-top:4rem;
+  border:0.5px solid var(--border);
+}
+.price-card{
+  padding:3rem;
+  border-right:0.5px solid var(--border);
+  position:relative;
+}
+.price-card:last-child{border-right:none;}
+.price-card.featured{background:rgba(200,150,62,0.04);}
+.price-tag-label{
+  font-size:0.6rem;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--mid);
+  margin-bottom:1.5rem;
+}
+.price-amount{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:5rem;
+  line-height:1;
+  margin-bottom:0.3rem;
+}
+.price-card.featured .price-amount{color:var(--gold-bright);}
+.price-card:not(.featured) .price-amount{color:rgba(242,240,237,0.3);}
+.price-unit{font-size:0.7rem;letter-spacing:0.1em;color:var(--mid);margin-bottom:2rem;}
+.price-items{list-style:none;margin-bottom:2.5rem;}
+.price-items li{
+  font-size:0.8rem;
+  color:var(--mid);
+  padding:0.7rem 0;
+  border-bottom:0.5px solid var(--border);
+  display:flex;gap:1rem;
+  align-items:baseline;
+}
+.price-items li::before{content:'—';color:var(--muted);font-size:0.6rem;}
+.price-save{
+  position:absolute;
+  top:1.5rem;right:1.5rem;
+  font-size:0.6rem;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  background:rgba(46,204,113,0.1);
+  color:#2ecc71;
+  padding:0.3rem 0.7rem;
+  border:0.5px solid rgba(46,204,113,0.2);
+}
+
+/* contact */
+.contact{border-top:0.5px solid var(--border);}
+.contact-grid{
+  display:grid;
+  grid-template-columns:1fr 1.2fr;
+  gap:6rem;
+  margin-top:4rem;
+  align-items:start;
+}
+.contact-left p{font-size:0.85rem;color:var(--mid);line-height:1.9;margin-bottom:2rem;}
+.contact-detail{
+  padding:1.2rem 0;
+  border-top:0.5px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.contact-detail:last-child{border-bottom:0.5px solid var(--border);}
+.cd-label{font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);}
+.cd-val{font-size:0.8rem;color:var(--white);}
+.contact-form{display:flex;flex-direction:column;gap:0;}
+.form-group{position:relative;border-top:0.5px solid var(--border);}
+.form-group:last-of-type{border-bottom:0.5px solid var(--border);}
+.form-group label{
+  display:block;
+  font-size:0.55rem;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--muted);
+  padding:1rem 0 0.3rem;
+}
+.form-group input,
+.form-group textarea,
+.form-group select{
+  width:100%;
+  background:transparent;
+  border:none;
+  outline:none;
+  color:var(--white);
+  font-family:'DM Sans',sans-serif;
+  font-size:0.9rem;
+  font-weight:300;
+  padding:0.3rem 0 1rem;
+  resize:none;
+  -webkit-appearance:none;
+}
+.form-group select option{background:var(--black);color:var(--white);}
+.form-group textarea{min-height:80px;}
+.form-submit{
+  margin-top:2rem;
+  background:var(--white);
+  color:var(--black);
+  border:none;
+  font-family:'DM Sans',sans-serif;
+  font-size:0.7rem;
+  font-weight:500;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  padding:1rem 2.5rem;
+  cursor:none;
+  transition:background 0.2s;
+  align-self:flex-start;
+}
+.form-submit:hover{background:var(--gold-bright);}
+.form-note{font-size:0.65rem;color:var(--muted);margin-top:1rem;line-height:1.6;}
+
+/* footer */
+footer{
+  border-top:0.5px solid var(--border);
+  padding:2rem 3rem;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.footer-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:0.9rem;
+  letter-spacing:0.2em;
+  color:var(--muted);
+}
+.footer-links{display:flex;gap:2rem;}
+.footer-links a{
+  font-size:0.6rem;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--muted);
+  text-decoration:none;
+  transition:color 0.2s;
+}
+.footer-links a:hover{color:var(--white);}
+.footer-copy{font-size:0.6rem;color:var(--muted);letter-spacing:0.05em;}
+
+/* reveal on scroll */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity 0.7s ease, transform 0.7s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+@keyframes reveal{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+/* mobile */
+@media(max-width:768px){
+  nav{padding:1.5rem 1.5rem;}
+  .nav-links{display:none;}
+  section{padding:5rem 1.5rem;}
+  .hero{padding:0 1.5rem 3rem;}
+  .hero-title{font-size:clamp(4rem,18vw,7rem);}
+  .hero-sub{flex-direction:column;gap:2rem;align-items:flex-start;}
+  .hero-cta{align-items:flex-start;}
+  .about-grid,.contact-grid{grid-template-columns:1fr;gap:3rem;}
+  .tools-grid{grid-template-columns:1fr;}
+  .tool-card{border-right:none;border-bottom:0.5px solid var(--border);}
+  .pricing-grid{grid-template-columns:1fr;}
+  .price-card{border-right:none;border-bottom:0.5px solid var(--border);}
+  footer{flex-direction:column;gap:1rem;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<nav>
+  <a href="#" class="nav-logo">Mohrfeld Solar</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#tools">Tools</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-line"></div>
+  <div class="hero-counter">Santa Cruz, CA &nbsp; 36.9741° N</div>
+
+  <div class="hero-eyebrow">Residential Solar Installation</div>
+  <h1 class="hero-title">
+    Mohrfeld
+    <span>Solar</span>
+  </h1>
+  <div class="hero-sub">
+    <p class="hero-desc">Best-in-class solar at $2.50/watt. Every home analyzed with satellite data. Every quote backed by real numbers.</p>
+    <div class="hero-cta">
+      <a href="https://solar-rooftop-estimator-icdgbrhgcyxy5xrjureh9b.streamlit.app/" target="_blank" class="btn-stark">Get Your Estimate</a>
+      <a href="#about" class="btn-ghost">Learn more ↓</a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span class="scroll-label">Scroll</span>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="section-num">01 — 04</div>
+  <div class="section-eyebrow">About</div>
+  <h2 class="section-title reveal">Built Different.<br>Priced Honest.</h2>
+  <div class="about-grid">
+    <div class="about-left reveal">
+      <div class="about-stats">
+        <div class="about-stat">
+          <div class="stat-big">$2.50</div>
+          <div class="stat-desc">per watt installed — vs $4.00 industry average</div>
+        </div>
+        <div class="about-stat">
+          <div class="stat-big">30%</div>
+          <div class="stat-desc">federal tax credit on every system</div>
+        </div>
+        <div class="about-stat">
+          <div class="stat-big">25+</div>
+          <div class="stat-desc">year system lifespan with top-tier panels</div>
+        </div>
+      </div>
+    </div>
+    <div class="about-right reveal">
+      <p>Most solar companies charge <strong>$4.00 per watt or more</strong>. That markup pays for sales teams, TV ads, and middlemen. Mohrfeld Solar cuts all of that — and passes the savings directly to you.</p>
+      <p>Every estimate is generated from <strong>real satellite roof data</strong>, not guesswork. You'll know your system size, your savings, and your payback period before anyone sets foot on your property.</p>
+      <p>This is solar the way it should be: <strong>transparent, affordable, and built to last</strong>. Based in Santa Cruz. Installing across California.</p>
+      <div class="signature">Wyatt Mohrfeld</div>
+      <div class="sig-title">Founder, Mohrfeld Solar</div>
+    </div>
+  </div>
+</section>
+
+<!-- TOOLS -->
+<section class="tools" id="tools">
+  <div class="section-num">02 — 04</div>
+  <div class="section-eyebrow">Tools</div>
+  <h2 class="section-title reveal">Know Before<br>You Commit.</h2>
+  <div class="tools-grid reveal">
+    <a href="https://solar-rooftop-estimator-icdgbrhgcyxy5xrjureh9b.streamlit.app/" target="_blank" class="tool-card">
+      <div class="tool-num">001</div>
+      <div class="tool-icon">🛰️</div>
+      <div class="tool-name">Roof Estimator</div>
+      <div class="tool-desc">Enter any address. Get instant roof analysis, system size, and cost estimate powered by Google Solar API.</div>
+      <div class="tool-link">Launch Tool →</div>
+    </a>
+    <a href="https://WyattMohrfeld.github.io/panel-selection/" target="_blank" class="tool-card">
+      <div class="tool-num">002</div>
+      <div class="tool-icon">⚡</div>
+      <div class="tool-name">Panel Catalog</div>
+      <div class="tool-desc">Browse the panels we install — from premium Maxeon to best-value Qcells. Real 2025 specs and pricing.</div>
+      <div class="tool-link">Browse Panels →</div>
+    </a>
+    <div class="tool-card" style="opacity:0.4;pointer-events:none;">
+      <div class="tool-num">003</div>
+      <div class="tool-icon">📊</div>
+      <div class="tool-name">ROI Calculator</div>
+      <div class="tool-desc">Model your 25-year return including California incentives, NEM 3.0, and battery storage. Coming soon.</div>
+      <div class="tool-link">Coming Soon</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="section-num">03 — 04</div>
+  <div class="section-eyebrow">Pricing</div>
+  <h2 class="section-title reveal">The Number<br>That Matters.</h2>
+  <div class="pricing-grid reveal">
+    <div class="price-card featured">
+      <div class="price-save">Best Value</div>
+      <div class="price-tag-label">Mohrfeld Solar</div>
+      <div class="price-amount">$2.50</div>
+      <div class="price-unit">per watt, fully installed</div>
+      <ul class="price-items">
+        <li>Google Solar API roof analysis</li>
+        <li>Premium panel selection (Qcells, REC, Maxeon)</li>
+        <li>Full permit and interconnection filing</li>
+        <li>Professional installation</li>
+        <li>25-year panel warranty</li>
+        <li>30% federal ITC assistance</li>
+      </ul>
+      <a href="#contact" class="btn-stark">Get a Quote</a>
+    </div>
+    <div class="price-card">
+      <div class="price-tag-label">Industry Average</div>
+      <div class="price-amount">$4.00</div>
+      <div class="price-unit">per watt, national average</div>
+      <ul class="price-items">
+        <li>Sales commission built in</li>
+        <li>TV and digital ad spend built in</li>
+        <li>Brand premium built in</li>
+        <li>Middlemen built in</li>
+        <li>Standard installation</li>
+        <li>Standard warranty</li>
+      </ul>
+      <div style="font-size:0.7rem;color:var(--muted);margin-top:1rem;line-height:1.7;">On a typical 7.2 kW system, the difference is <span style="color:var(--white);">$10,800</span> out of your pocket.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="section-num">04 — 04</div>
+  <div class="section-eyebrow">Contact</div>
+  <h2 class="section-title reveal">Let's Talk<br>About Your Roof.</h2>
+  <div class="contact-grid">
+    <div class="contact-left reveal">
+      <p>Fill out the form and I'll run your address through the estimator before we even speak — so our first conversation is about your specific roof, your specific savings, and your specific payback period.</p>
+      <p>No sales pressure. No vague estimates. Just numbers.</p>
+      <div class="contact-detail">
+        <span class="cd-label">Location</span>
+        <span class="cd-val">Santa Cruz, CA</span>
+      </div>
+      <div class="contact-detail">
+        <span class="cd-label">Service Area</span>
+        <span class="cd-val">California</span>
+      </div>
+      <div class="contact-detail">
+        <span class="cd-label">GitHub</span>
+        <span class="cd-val">WyattMohrfeld</span>
+      </div>
+    </div>
+    <div class="contact-right reveal">
+      <form class="contact-form" onsubmit="handleSubmit(event)">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" placeholder="Your name" required>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" placeholder="your@email.com" required>
+        </div>
+        <div class="form-group">
+          <label>Property Address</label>
+          <input type="text" placeholder="123 Main St, Santa Cruz, CA">
+        </div>
+        <div class="form-group">
+          <label>Monthly Electricity Bill</label>
+          <select>
+            <option value="">Select range</option>
+            <option>Under $100</option>
+            <option>$100 – $200</option>
+            <option>$200 – $300</option>
+            <option>$300 – $500</option>
+            <option>Over $500</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Message (optional)</label>
+          <textarea placeholder="Anything else I should know..."></textarea>
+        </div>
+        <button type="submit" class="form-submit">Send Message</button>
+        <p class="form-note" id="form-msg"></p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">Mohrfeld Solar</div>
+  <div class="footer-links">
+    <a href="https://github.com/WyattMohrfeld/solar-rooftop-estimator" target="_blank">GitHub</a>
+    <a href="https://solar-rooftop-estimator-icdgbrhgcyxy5xrjureh9b.streamlit.app/" target="_blank">Estimator</a>
+    <a href="https://WyattMohrfeld.github.io/panel-selection/" target="_blank">Panels</a>
+  </div>
+  <div class="footer-copy">© 2025 Mohrfeld Solar · Santa Cruz, CA</div>
+</footer>
+
+<script>
+// custom cursor
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX; my=e.clientY;
+  cursor.style.left=mx+'px';
+  cursor.style.top=my+'px';
+});
+function animRing(){
+  rx+=(mx-rx)*0.12;
+  ry+=(my-ry)*0.12;
+  ring.style.left=rx+'px';
+  ring.style.top=ry+'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+document.querySelectorAll('a,button,.tool-card').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{
+    cursor.style.transform='translate(-50%,-50%) scale(2.5)';
+    cursor.style.background=getComputedStyle(document.documentElement).getPropertyValue('--gold-bright');
+    ring.style.width='56px'; ring.style.height='56px';
+    ring.style.borderColor='rgba(245,166,35,0.4)';
+  });
+  el.addEventListener('mouseleave',()=>{
+    cursor.style.transform='translate(-50%,-50%) scale(1)';
+    cursor.style.background='var(--white)';
+    ring.style.width='32px'; ring.style.height='32px';
+    ring.style.borderColor='rgba(242,240,237,0.3)';
+  });
+});
+
+// scroll reveal
+const observer = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting) e.target.classList.add('visible');
+  });
+},{threshold:0.15});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+// form
+function handleSubmit(e){
+  e.preventDefault();
+  const msg = document.getElementById('form-msg');
+  msg.style.color='#2ecc71';
+  msg.textContent='Message received — I\'ll be in touch within 24 hours.';
+  e.target.reset();
+}
+</script>
+</body>
+</html>
